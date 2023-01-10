@@ -12,12 +12,20 @@ local hook_Run = hook.Run
 local SysTime = SysTime
 local ipairs = ipairs
 
+local antiSpam = CreateConVar( 'sv_chat_tts_antispam', '1', FCVAR_ARCHIVE, ' - TTS anti-spam protection.', 0, 1 )
+local antiSpamDelay = CreateConVar( 'sv_chat_tts_antispam_delay', '1', FCVAR_ARCHIVE, ' - TTS anti-spam block delay.', 0, 60 )
 hook.Add('PlayerSay', 'PLib - TTS', function( speaker, text, isTeam )
     if (speaker:GetInfoNum( 'cl_chat_tts', 0 ) ~= 1) then return end
     if speaker:IsSpeaking() then return end
 
-    if speaker.PLibTTS and (SysTime() - speaker.PLibTTS < 0.5) then return end
-    speaker.PLibTTS = SysTime()
+    if antiSpam:GetBool() then
+        if (SysTime() < (speaker.PLibTTS or 0)) then
+            speaker.PLibTTS = SysTime() + antiSpamDelay:GetFloat() * 2
+            return
+        end
+
+        speaker.PLibTTS = SysTime() + antiSpamDelay:GetFloat()
+    end
 
     local listeners = { speaker }
     local speakerTeam = speaker:Team()
