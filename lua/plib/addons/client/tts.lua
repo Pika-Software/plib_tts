@@ -5,7 +5,7 @@ CreateClientConVar( 'cl_chat_tts', '0', true, true, ' - Converts your text from 
 local net_ReadString = net.ReadString
 local cvars_Number = cvars.Number
 local hook_Remove = hook.Remove
-local sound_TTS = sound.TTS
+local sound_PlayTTS = sound.PlayTTS
 local hook_Add = hook.Add
 local IsValid = IsValid
 
@@ -14,7 +14,7 @@ net.Receive('PLib - TTS', function()
     if IsValid( ply ) then
         if ply:IsMuted() then return end
         if ply:IsSpeaking() then return end
-        sound_TTS(net_ReadString(), '3d', function( channel )
+        sound_PlayTTS(net_ReadString(), '3d', function( channel )
             if IsValid( ply ) then
                 local prevChannel = ply.PLibTTS
                 if IsValid( prevChannel ) then
