@@ -16,6 +16,7 @@ local antiSpam = CreateConVar( 'sv_chat_tts_antispam', '1', FCVAR_ARCHIVE, ' - T
 local antiSpamDelay = CreateConVar( 'sv_chat_tts_antispam_delay', '1', FCVAR_ARCHIVE, ' - TTS anti-spam block delay.', 0, 60 )
 hook.Add('PlayerSay', 'PLib - TTS', function( speaker, text, isTeam )
     if (speaker:GetInfoNum( 'cl_chat_tts', 0 ) ~= 1) then return end
+    if (hook.Run( 'PlayerTTS', speaker ) == false) then return end
     if speaker:IsSpeaking() then return end
 
     if antiSpam:GetBool() then
