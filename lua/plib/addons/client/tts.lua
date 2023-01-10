@@ -33,6 +33,8 @@ net.Receive('PLib - TTS', function()
                         self:Stop()
                     end
                 end)
+
+                channel:Play()
             end
         end)
     end
