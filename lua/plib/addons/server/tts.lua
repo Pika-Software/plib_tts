@@ -18,6 +18,7 @@ hook.Add('PlayerSay', 'PLib - TTS', function( speaker, text, isTeam )
     if (speaker:GetInfoNum( 'cl_chat_tts', 0 ) ~= 1) then return end
     if (hook.Run( 'PlayerTTS', speaker ) == false) then return end
     if speaker:IsSpeaking() then return end
+    if !speaker:Alive() then return end
 
     if antiSpam:GetBool() then
         if (SysTime() < (speaker.PLibTTS or 0)) then
@@ -33,10 +34,10 @@ hook.Add('PlayerSay', 'PLib - TTS', function( speaker, text, isTeam )
     local speakerIndex = speaker:EntIndex()
     for _, listener in ipairs( player_GetHumans() ) do
         if (speakerIndex == listener:EntIndex()) then continue end
-        if not listener:TestPVS( speaker ) then continue end
+        if !listener:TestPVS( speaker ) then continue end
         if isTeam and (speakerTeam ~= listener:Team()) then continue end
-        if not hook_Run( 'PlayerCanHearPlayersVoice', listener, speaker ) then continue end
-        if not hook_Run( 'PlayerCanSeePlayersChat', text, isTeam, listener, speaker ) then continue end
+        if !hook_Run( 'PlayerCanHearPlayersVoice', listener, speaker ) then continue end
+        if !hook_Run( 'PlayerCanSeePlayersChat', text, isTeam, listener, speaker ) then continue end
         table_insert( listeners, listener )
     end
 
@@ -45,5 +46,9 @@ hook.Add('PlayerSay', 'PLib - TTS', function( speaker, text, isTeam )
             net_WriteEntity( speaker )
             net_WriteString( text )
         net_Send( listeners )
+    end
+
+    if (speaker:GetInfoNum( 'cl_chat_tts_hide_messages', 0 ) == 1) then
+        return ''
     end
 end)
